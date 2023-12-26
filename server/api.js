@@ -25,13 +25,13 @@ app.get("/api/getusers", async (req, res) => {
   }
 });
 
-app.post("/users", async (req, res) => {
+app.post("/api/users", async (req, res) => {
   console.log(req.body);
-  const { firstname, lastname, location } = req.body;
+  const { title,description,date,status} = req.body;
 
   const insertQuery =
-    "INSERT INTO users(firstname, lastname, location) VALUES ($1, $2, $3)";
-  const values = [firstname, lastname, location];
+    "INSERT INTO users(title,description,date,status) VALUES ($1, $2, $3,$4)";
+  const values = [title,description,date,status]
 
   try {
     // Assuming `pool` is your PostgreSQL connection pool

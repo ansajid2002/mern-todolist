@@ -1,29 +1,22 @@
 import React, { useState } from 'react'
-import { Button, Modal, Checkbox, Form, Input, DatePicker } from 'antd';
+import { Button, Modal, Checkbox, Form, Input, DatePicker, Menu } from 'antd';
 import { DownOutlined } from '@ant-design/icons';
 import { Dropdown, Space, Typography } from 'antd';
+import moment from "moment"
+import { Adminurl } from '../App';
 
 const Createtask = () => {
-
 
     const [taskData,setTaskData] = useState({
         title: '',
         description: '',
         date: null,
-        status: '',
+        status: 'Pending',
     })
     const [isModalOpen, setIsModalOpen] = useState(false);
 
     const showModal = () => {
         setIsModalOpen(true);
-    };
-
-
-    const onFinishFailed = (errorInfo) => {
-        console.log('Failed:', errorInfo);
-    };
-    const handleOk = () => {
-        setIsModalOpen(false);
     };
 
     const handleCancel = () => {
@@ -32,16 +25,16 @@ const Createtask = () => {
 
     const items = [
         {
-            key: '1',
-            label: 'Item 1',
+            id: '1',
+            key: 'Pending',
         },
         {
-            key: '2',
-            label: 'Item 2',
+          id: '2',
+          key: 'Completed',
         },
         {
-            key: '3',
-            label: 'Item 3',
+          id: '3',
+            key: 'Cancelled',
         },
     ];
 
@@ -49,26 +42,50 @@ const Createtask = () => {
         // Update taskData with the changed form values
         setTaskData({ ...taskData, ...changedValues });
       };
-    
-      const onFinish = () => {
-        console.log(taskData); // Task data when form is submitted
-        // You can perform further actions or submit the data to an API
+      const handleStatusChange = (selected) => {
+        setTaskData({ ...taskData, status: selected });
       };
-console.log(taskData,"taskDATA");       
+    
+    
+      const onFinish = async () => {
+        
+
+        try {
+          const response = await fetch(`${Adminurl}/api/users`, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify(taskData),
+          });
+      
+          if (response.ok) {
+            const responseData = await response.json();
+            console.log("Data posted successfully:", responseData);
+            setTaskData({
+              title: '',
+              description: '',
+              date: null,
+              status: 'Pending',
+            });
+            // form.resetFields();
+            setIsModalOpen(false);
+          } else {
+            console.error("Error occurred while posting data:", response.status);
+          }
+        } catch (error) {
+          console.error("An error occurred:", error);
+        }
+      };
+// console.log(moment(taskData?.date).format('LL'),"taskDATA"); 
+console.log(taskData);      
     return (<>
 
-        <h1 onClick={showModal} className=' cursor-pointer text-xl p-1 border bg-green-400 text-center rounded-md'>Create New Task</h1>
+        <h1 onClick={showModal} className=' cursor-pointer text-xl p-1 border bg-green-400 text-center rounded-md'>Create Task</h1>
 
-        <Modal title="Task Details" open={isModalOpen}
+        <Modal title="Task Details" open={isModalOpen} onCancel={handleCancel}
 
-            footer={[
-                <Button onClick={handleCancel}>
-                    Cancel
-                </Button>,
-                <Button onClick={handleOk}>
-                    Custom OK
-                </Button>,
-            ]}>
+            footer={null}>
            <Form
       name="basic"
       labelCol={{
@@ -124,32 +141,34 @@ console.log(taskData,"taskDATA");
       >
         <DatePicker format="YYYY-MM-DD" />
       </Form.Item>
-      <Form.Item
-        label="Status"
-        name="status"
-        labelAlign='left'
-        rules={[
+
+
+      <Form.Item label="Status" name="status"  rules={[
           {
             required: true,
-            message: 'Please input Status!',
+            message: 'Please input your status!',
           },
-        ]}
-      >
+        ]}>
         <Dropdown
-          menu={{
-            items,
-            selectable: true,
-            defaultSelectedKeys: ['3'],
-          }}
+          overlay={(
+            <Menu onClick={({ key }) => handleStatusChange(key)}>
+              {items.map(item => (
+                <Menu.Item key={item.key}>
+                  {item.key}
+                </Menu.Item>
+              ))}
+            </Menu>
+          )}
         >
           <Space>
-            {`Status ${taskData?.status}`}
+            {`${taskData.status}`}
             <DownOutlined />
           </Space>
         </Dropdown>
       </Form.Item>
+      
       <Form.Item wrapperCol={{ offset: 6 }}>
-        <Button type="primary" htmlType="submit">
+        <Button htmlType="submit" >
           SUBMIT
         </Button>
       </Form.Item>

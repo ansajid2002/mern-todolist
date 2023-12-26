@@ -8,8 +8,11 @@ function App() {
 
   return (
     <>
-      <h1 className="text-center text-4xl py-2 font-bold bg-gray-200">To Do List</h1>
+      <h1 className="text-center text-4xl py-2 font-bold ">To Do List</h1>
+      <div className=''>
       <Alltasks/>
+
+      </div>
     
 
     </>
