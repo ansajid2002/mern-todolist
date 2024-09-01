@@ -24,11 +24,23 @@ app.get("/api/getusers", async (req, res) => {
     res.status(500).json({ error: "Internal Server Error" });
   }
 });
+app.get("/api/sajid", async (req, res) => {
+
+
+  try {
+ 
+    res.json({ data: {name: "SAJID TESTING LIGHTSAIL"} });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+});
 
 app.post("/api/users", async (req, res) => {
   console.log(req.body);
   const { title,description,date,status} = req.body;
-
+  console.log(title,description,date,status,"sahil");
+  
   const insertQuery =
     "INSERT INTO users(title,description,date,status) VALUES ($1, $2, $3,$4)";
   const values = [title,description,date,status]
